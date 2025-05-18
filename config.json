@@ -1,0 +1,6 @@
+{
+  "domain": "http://localhost:5000",
+  "flask_host": "127.0.0.1",
+  "flask_port": 5000
+}
+
