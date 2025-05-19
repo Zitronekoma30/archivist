@@ -65,137 +65,161 @@ def archive():
           <div class="content">{body}</div>
         </div>""")
     
+    return render_archive(cards)
+
+def render_archive(cards):
     return f"""<!doctype html><html lang="en">
 <head><meta charset="utf-8">
 <title>The Archive</title>
 <style>
-* {{ box-sizing: border-box; }}
+* {{ box-sizing:border-box; }}
 body {{
-  margin: 0;
-  font-family: 'Georgia', serif;
-  background: var(--bg);
-  color: var(--fg);
-  transition: background 0.3s, color 0.3s;
+  margin:0;
+  font-family:'Georgia',serif;
+  background:var(--bg);
+  color:var(--fg);
+  transition:background .3s,color .3s;
 }}
 
 :root {{
-  --bg: #f9f6f1;
-  --fg: #2d1f14;
-  --card-bg: #fff8f0;
-  --card-shadow: rgba(0,0,0,0.05);
-  --accent: #6e4b2e;
+  --bg:#f9f6f1;
+  --fg:#2d1f14;
+  --card-bg:#fff8f0;
+  --card-shadow:rgba(0,0,0,.05);
+  --accent:#6e4b2e;
 }}
-
 body.dark {{
-  --bg: #1f1a17;
-  --fg: #f4e9d8;
-  --card-bg: #2a211c;
-  --card-shadow: rgba(0,0,0,0.3);
-  --accent: #d2b48c;
+  --bg:#1f1a17;
+  --fg:#f4e9d8;
+  --card-bg:#2a211c;
+  --card-shadow:rgba(0,0,0,.3);
+  --accent:#d2b48c;
 }}
 
 h1 {{
-  text-align: center;
-  margin: 2rem 0 1rem;
-  font-size: 2.5rem;
-  position: relative;
+  text-align:center;
+  margin:2rem 0 1rem;
+  font-size:2.5rem;
+  position:relative;
 }}
 
 #toggle-theme {{
-  position: absolute;
-  right: 2rem;
-  top: 2rem;
-  background: none;
-  border: 1px solid var(--fg);
-  color: var(--fg);
-  padding: 0.4rem 0.8rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: inherit;
+  position:absolute;
+  right:2rem;
+  top:2rem;
+  background:none;
+  border:1px solid var(--fg);
+  color:var(--fg);
+  padding:.4rem .8rem;
+  border-radius:5px;
+  cursor:pointer;
+  font-family:inherit;
+}}
+
+#search {{
+  display:block;
+  margin:0 auto 1.5rem;
+  padding:.5rem .8rem;
+  font-size:1rem;
+  width:clamp(200px,50%,400px);
+  border:1px solid var(--accent);
+  border-radius:6px;
+  background:var(--card-bg);
+  color:var(--fg);
 }}
 
 .grid {{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.2rem;
-  padding: 1.5rem;
-  max-width: 1200px;
-  margin: auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.2rem;
+  padding:1.5rem;
+  max-width:1200px;
+  margin:auto;
 }}
 
 .card {{
-  background: var(--card-bg);
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 3px 8px var(--card-shadow);
-  transition: transform .1s ease;
+  background:var(--card-bg);
+  border-radius:10px;
+  padding:1rem;
+  box-shadow:0 3px 8px var(--card-shadow);
+  transition:transform .1s ease;
+  overflow:hidden;           /* keep children inside */
 }}
-.card:hover {{
-  transform: scale(1.01);
-}}
+.card:hover {{ transform:scale(1.01); }}
 
 .meta {{
-  font-size: 0.85rem;
-  color: var(--accent);
-  margin-bottom: .6rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: .5rem;
+  font-size:.85rem;
+  color:var(--accent);
+  margin-bottom:.6rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:.5rem;
 }}
 
 .copy-btn {{
-  border: 0;
-  background: transparent;
-  font-size: 1rem;
-  cursor: pointer;
-  color: var(--accent);
+  border:0;
+  background:transparent;
+  font-size:1rem;
+  cursor:pointer;
+  color:var(--accent);
 }}
-.copy-btn:active {{ transform: scale(.9); }}
+.copy-btn:active {{ transform:scale(.9); }}
 
 .content {{
-  white-space: pre-wrap;
-  line-height: 1.5;
+  white-space:pre-wrap;
+  line-height:1.5;
+  overflow-wrap:anywhere;    /* long URLs/text won’t overflow */
+  word-break:break-word;
 }}
 
 .preview {{
-  max-width: 100%;
-  border-radius: 4px;
-  margin-top: .5rem;
-  box-shadow: 0 0 4px var(--card-shadow);
+  max-width:100%;
+  border-radius:4px;
+  margin-top:.5rem;
+  box-shadow:0 0 4px var(--card-shadow);
 }}
 </style>
 </head><body>
-<h1>The Archive <button id="toggle-theme">🌓</button></h1>
+<h1>The Archive <button id="toggle-theme" title="Toggle theme">🌓</button></h1>
+
+<input type="search" id="search" placeholder="Search…">
+
 <div class="grid">{''.join(cards)}</div>
 
 <script>
-// Copy to clipboard
+// copy-to-clipboard
 document.addEventListener('click', e => {{
-  if (e.target.classList.contains('copy-btn')) {{
-    const card = e.target.closest('.card');
+  if (e.target.closest('.copy-btn')) {{
+    const btn  = e.target.closest('.copy-btn');
+    const card = btn.closest('.card');
     const txt  = card.querySelector('.content').innerText;
     navigator.clipboard.writeText(txt).then(() => {{
-      e.target.textContent = '✓';
-      setTimeout(() => e.target.textContent = '📋', 1500);
+      btn.textContent = '✓';
+      setTimeout(() => btn.textContent = '📋', 1500);
     }});
   }}
 }});
 
-// Theme toggle
-const toggle = document.getElementById("toggle-theme");
-const body = document.body;
-if (localStorage.getItem("theme") === "dark") {{
-  body.classList.add("dark");
-}}
+// live search
+const search = document.getElementById('search');
+search.addEventListener('input', () => {{
+  const q = search.value.toLowerCase();
+  document.querySelectorAll('.card').forEach(c => {{
+    c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none';
+  }});
+}});
 
-toggle.addEventListener("click", () => {{
-  body.classList.toggle("dark");
-  localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
+// theme toggle
+const toggle = document.getElementById('toggle-theme');
+const body   = document.body;
+if (localStorage.getItem('theme') === 'dark') body.classList.add('dark');
+toggle.addEventListener('click', () => {{
+  body.classList.toggle('dark');
+  localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
 }});
 </script>
 </body></html>"""
-
 
 # ---------- standalone runner ------------------------------------------------
 
