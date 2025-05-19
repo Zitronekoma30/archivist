@@ -16,7 +16,7 @@ Use your phone's Share button on any app, pick Discord, and DM it to The Archivi
 ---
 
 ## 🚀 Get Started  
-**[➕ Click here]([https://your-invite-link.com](https://discord.com/oauth2/authorize?client_id=1373633936575434872&permissions=0&integration_type=0&scope=bot))** to invite the bot!
+[➕ Click here](https://discord.com/oauth2/authorize?client_id=1373633936575434872&permissions=0&integration_type=0&scope=bot) to invite the bot!
 Then just DM it on Discord to begin.
 
 ---
