@@ -47,7 +47,7 @@ def _linkify(text: str) -> str:
 
 from datetime import datetime
 
-DATE_FMT = "%d %b %Y %H:%M"
+DATE_FMT = "%d %b %Y"
 
 @app.route("/archive")
 def archive():
