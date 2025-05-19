@@ -44,13 +44,28 @@ def _linkify(text: str) -> str:
 
 # ---------- route ------------------------------------------------------------
 
+
+from datetime import datetime
+
+DATE_FMT = "%d %b %Y %H:%M"
+
 @app.route("/archive")
 def archive():
-    token  = request.args.get("token") or abort(400)
-    group  = _group_id(token)           or abort(404)
+    token = request.args.get("token") or abort(400)
+    group = _group_id(token)           or abort(404)
+
+    # newest first ↓↓↓
+    msgs = sorted(get_messages(group), key=lambda m: m[3], reverse=True)
 
     cards = []
-    for author, txt, atts, ts in get_messages(group):
+    for author, txt, atts, ts in msgs:
+        # normalise → datetime, then pretty-print
+        if isinstance(ts, (int, float)):
+            dt = datetime.fromtimestamp(ts)
+        else:                              # ISO string etc.
+            dt = datetime.fromisoformat(str(ts))
+        pretty = dt.strftime(DATE_FMT)
+
         body = _linkify(txt or "")
         if atts:
             for url in atts.split(", "):
@@ -59,12 +74,12 @@ def archive():
         cards.append(f"""
         <div class="card">
           <div class="meta">
-            {html.escape(author)} @ {ts}
-            <button class="copy-btn" title="Copy to clipboard">📋</button>
+            {html.escape(author)}
+            <time datetime="{dt.isoformat()}">{pretty}</time>
           </div>
           <div class="content">{body}</div>
         </div>""")
-    
+
     return render_archive(cards)
 
 def render_archive(cards):
